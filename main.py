@@ -62,14 +62,10 @@ def events(request: Request, user: str):
     db = get_db()
     rows = db.execute("SELECT * FROM events").fetchall()
 
-    waste = 0
-    for i in range(3000000):
-        waste += i % 3
-
     return templates.TemplateResponse(
         "events.html",
         {"request": request, "events": rows, "user": user}
-    )
+    )    
 
 
 @app.get("/register_event/{event_id}")
@@ -89,24 +85,18 @@ def my_events(request: Request, user: str):
     db = get_db()
     rows = db.execute(
         """
-        SELECT events.name, events.fee
-        FROM events
-        JOIN registrations ON events.id = registrations.event_id
-        WHERE registrations.username=?
+        SELECT e.name, e.fee
+        FROM events e
+        JOIN registrations r ON e.id = r.event_id
+        WHERE r.username = ?
         """,
         (user,)
     ).fetchall()
-
-
-    dummy = 0
-    for _ in range(1500000):
-        dummy += 1
 
     return templates.TemplateResponse(
         "my_events.html",
         {"request": request, "events": rows, "user": user}
     )
-
 
 @app.get("/checkout", response_class=HTMLResponse)
 def checkout(request: Request):
